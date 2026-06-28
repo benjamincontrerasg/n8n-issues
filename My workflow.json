@@ -26,13 +26,13 @@
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"title\": \"Tarea del día 📋 - {{ $now.toFormat('dd/MM/yyyy') }}\",\n  \"body\": \"Esta es tu tarea automática creada por n8n el {{ $now.toFormat('dd/MM/yyyy') }}.\",\n  \"labels\": [\"tarea-diaria\"]\n}",
+        "jsonBody": "={\n  \"title\": \"💡 {{ $json.title }}\",\n  \"body\": \"## Descripción\\n{{ $json.description }}\\n\\n## Tecnologías\\n{{ $json.technologies }}\",\n  \"labels\": [\"idea-portafolio\"]\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        208,
+        624,
         0
       ],
       "id": "20848225-305b-4832-a4d4-1933bbce4ec0",
@@ -43,11 +43,81 @@
           "name": "Header Auth account"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "YOUR_ANTHROPIC_API_KEY"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"model\": \"claude-haiku-4-5-20251001\",\n  \"max_tokens\": 300,\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Genera una idea de proyecto para portafolio de desarrollo web. Responde SOLO en este formato JSON sin texto extra ni backticks:\\n{\\\"title\\\": \\\"nombre del proyecto\\\", \\\"description\\\": \\\"descripción en 2 oraciones\\\", \\\"technologies\\\": \\\"tecnologías separadas por coma\\\"}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "42a80fd3-1704-4532-a41d-ab2fdfd16094",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.content[0].text;\nconst clean = raw.replace(/```json\\n?/g, '').replace(/```/g, '').trim();\nconst idea = JSON.parse(clean);\n\nreturn [{\n  json: {\n    title: idea.title,\n    description: idea.description,\n    technologies: idea.technologies\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "197cfbcc-ed36-4886-9b45-2c0ef78ad97e",
+      "name": "Code in JavaScript"
     }
   ],
   "pinData": {},
   "connections": {
     "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
       "main": [
         [
           {
@@ -64,7 +134,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "89e5960b-669e-442c-8165-54a0a24e8b50",
+  "versionId": "2b886e52-adef-4cf1-a939-b6f2ef52fdff",
   "meta": {
     "instanceId": "64214b72f84d791a4341a6fd141e20b659266a40b4e9f2e8ea94084bc68b7496"
   },
