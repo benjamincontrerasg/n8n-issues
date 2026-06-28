@@ -1,0 +1,74 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0d658889-abc7-47b1-96b6-9a46b79f7bd7",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.github.com/repos/benjamincontrerasg/n8n-issues/issues",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"Tarea del día 📋 - {{ $now.toFormat('dd/MM/yyyy') }}\",\n  \"body\": \"Esta es tu tarea automática creada por n8n el {{ $now.toFormat('dd/MM/yyyy') }}.\",\n  \"labels\": [\"tarea-diaria\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "20848225-305b-4832-a4d4-1933bbce4ec0",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "n6YoxYZzqBvBCR9V",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "89e5960b-669e-442c-8165-54a0a24e8b50",
+  "meta": {
+    "instanceId": "64214b72f84d791a4341a6fd141e20b659266a40b4e9f2e8ea94084bc68b7496"
+  },
+  "nodeGroups": [],
+  "id": "IHGHf2RUR7u0z6Xt",
+  "tags": []
+}
